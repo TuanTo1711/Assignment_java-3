@@ -35,39 +35,39 @@ public class Validator {
             return false;
         }
 
-        if (obj instanceof JTextField) {
-            this.object = ((JTextField) obj);
+        if (obj instanceof JTextField jTextField) {
+            this.object = jTextField;
 
-            String value = ((JTextField) obj).getText();
+            String value = jTextField.getText();
             return value.isEmpty();
         }
 
-        if (obj instanceof JPasswordField) {
-            this.object = ((JPasswordField) obj);
+        if (obj instanceof JPasswordField jPasswordField) {
+            this.object = jPasswordField;
 
-            String value = String.valueOf(((JPasswordField) obj).getPassword());
+            String value = String.valueOf(jPasswordField.getPassword());
             return value.isEmpty();
         }
 
-        if (obj instanceof JTextArea) {
-            this.object = ((JTextArea) obj);
+        if (obj instanceof JTextArea jTextArea) {
+            this.object = jTextArea;
 
-            String value = String.valueOf(((JTextArea) obj).getText());
+            String value = String.valueOf(jTextArea.getText());
             return value.isEmpty();
         }
 
-        if (obj instanceof JComboBox) {
-            this.object = ((JComboBox) obj);
+        if (obj instanceof JComboBox jComboBox) {
+            this.object = jComboBox;
 
-            JComboBox cbx = ((JComboBox) obj);
+            JComboBox cbx = jComboBox;
             return cbx.getSelectedItem().equals(cbx.getItemAt(0));
         }
 
-        if (obj instanceof ButtonGroup) {
-            this.object = ((ButtonGroup) obj);
+        if (obj instanceof ButtonGroup buttonGroup) {
+            this.object = buttonGroup;
 
-            ButtonGroup buttonGroup = ((ButtonGroup) obj);
-            for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
+            ButtonGroup buttonsGroup = buttonGroup;
+            for (var buttons = buttonsGroup.getElements(); buttons.hasMoreElements();) {
                 JRadioButton temp = (JRadioButton) buttons.nextElement();
                 if (temp.isSelected()) {
                     return false;
@@ -76,10 +76,10 @@ public class Validator {
             return true;
         }
 
-        if (obj instanceof JCheckBox) {
-            this.object = ((JCheckBox) obj);
+        if (obj instanceof JCheckBox jCheckBox) {
+            this.object = jCheckBox;
 
-            JCheckBox ticked = ((JCheckBox) obj);
+            JCheckBox ticked = jCheckBox;
             return !ticked.isSelected();
         }
 
@@ -112,8 +112,7 @@ public class Validator {
     }
 
     public boolean isName(JTextField input) {
-        final Pattern regex = Pattern.compile("[a-z\\D_-]{3,}$"
-                + "|[aàảãáạăằẳẵắặâầẩẫấậbcdđeèẻẽéẹêềểễếệfghiìỉĩíịjklmnoòỏõóọôồổỗốộơờởỡớợpqrstuùủũúụưừửữứựvwxyỳỷỹýỵz_]+");
+        final Pattern regex = Pattern.compile("[a-z\\D_-]{3,}$");
         Matcher matcher = regex.matcher(input.getText());
         return matcher.find();
     }
@@ -140,8 +139,8 @@ public class Validator {
         return false;
     }
 
-    public boolean isEmail(String value) {
-        final Pattern regex = Pattern.compile("^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$");
+    public boolean isStudentID(String value) {
+        final Pattern regex = Pattern.compile("^(PS|ps){1}\\d{5}$");
         Matcher matcher = regex.matcher(value);
         return matcher.find();
     }
