@@ -30,7 +30,6 @@ public class Validator {
     }
 
     public boolean isRequired(Object obj) {
-        this.message = "Trường này không được để trống";
         if (Objects.isNull(obj)) {
             this.object = null;
             return false;
@@ -83,26 +82,18 @@ public class Validator {
             JCheckBox ticked = jCheckBox;
             return !ticked.isSelected();
         }
-        
+
         return false;
     }
 
     public boolean isRequired(Object obj, String message) {
-        this.message = message.isEmpty() ? "Trường này không được để trống" : message;
+        this.message = (message == null || message.isEmpty())
+                ? "Trường này không được để trống" : message;
         return isRequired(obj);
     }
 
-    public boolean isRequired(JCheckBox... selections) {
-        List<Boolean> isTrue = new ArrayList<>();
-
-        Arrays.asList(selections).forEach(obj -> {
-            isTrue.add(isRequired(obj));
-        });
-
-        return isTrue.stream().allMatch(t -> t);
-    }
-
     public boolean isRequired(Object... objs) {
+        this.message = "Trường này không được để trống";
         List<Boolean> isTrue = new ArrayList<>();
 
         Arrays.asList(objs).forEach(obj -> {
@@ -112,44 +103,54 @@ public class Validator {
         return isTrue.stream().anyMatch(t -> t);
     }
 
-    public boolean isName(JTextField input) {
-        this.message = "Username không hợp lệ";
-        final Pattern regex = Pattern.compile("[a-z\\D_-]{3,}$");
-        Matcher matcher = regex.matcher(input.getText());
-        return matcher.find();
-    }
-    
-    public boolean isName(JTextField input, String message) {
-        this.message = message.isEmpty() ? "Username không hợp lệ" : message;
-        return isName(input);
+    public boolean isID(JTextField input, String message, String compareID) {
+        this.message = (message == null || message.isEmpty())
+                ? "This ID is invalid" : message;
+
+        return compareID.equalsIgnoreCase(input.getText());
     }
 
-    public boolean isPassword(JPasswordField password) {
+    public boolean isID(JTextField input, String message, Pattern pattern) {
+        this.message = (message == null || message.isEmpty())
+                ? "This ID is invalid" : message;
+
+        return pattern.matcher(input.getText()).find();
+    }
+
+    public boolean isPassword(JPasswordField password, String message, 
+                                String comparePassword) 
+    {
+        this.message = (message == null || message.isEmpty())
+                ? "This password is invalid"
+                : message;
+        
         String password_value = String.valueOf(password.getPassword());
 
-        if (password_value != null) {
-            final String MIN_LENGHT = "8";
-            final String MAX_LENGHT = "20";
-
-            final String ONE_DIGIT = "(?=.*[0-9])";
-            final String LOWER_CASE = "(?=.*[a-z])";
-            final String UPPER_CASE = "(?=.*[A-Z])";
-            final String NO_SPACE = "(?=\\S+$)";
-            final String MIN_MAX_CHAR = ".{" + MIN_LENGHT + "," + MAX_LENGHT + "}";
-
-            final String PATTERN = ONE_DIGIT + LOWER_CASE + UPPER_CASE
-                    + NO_SPACE + MIN_MAX_CHAR;
-
-            return password_value.matches(PATTERN);
-        }
-
-        return false;
+        return password_value.equalsIgnoreCase(comparePassword);
     }
 
-    public boolean isStudentID(String value) {
-        final Pattern regex = Pattern.compile("^(PS|ps){1}\\d{5}$");
-        Matcher matcher = regex.matcher(value);
-        return matcher.find();
+    public boolean isName(JTextField input, String message) {
+        this.message = (message == null || message.isEmpty())
+                ? "This name is invalid" : message;
+        final Pattern regex = Pattern.compile("^[a-z\\D_-]{6,12}$");
+
+        return regex.matcher(input.getText()).find();
+    }
+
+    public boolean isName(JTextField input, String message, String compareName) {
+        this.message = (message == null || message.isEmpty())
+                ? "This name is invalid" : message;
+        final Pattern regex = Pattern.compile("^[a-z\\D_-]{6,12}$");
+
+        return regex.matcher(input.getText()).find()
+                && input.getText().equalsIgnoreCase(compareName);
+    }
+
+    public boolean isEmail(String email, String message) {
+        this.message = message == null || message.isEmpty() 
+                ? "Email is invalid" 
+                : message;
+        return email.matches("^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$");
     }
 
     public Object getObject() {

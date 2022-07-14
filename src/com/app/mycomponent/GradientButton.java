@@ -1,4 +1,4 @@
-package com.app.controller;
+package com.app.mycomponent;
 
 import java.awt.*;
 import java.awt.event.MouseMotionListener;
@@ -20,8 +20,6 @@ public class GradientButton extends JButton {
 
     public GradientButton(String text) {
         super(text);
-        setContentAreaFilled(false);
-        setFocusPainted(false);
         setBg(transparentControls);
     }
 
@@ -84,6 +82,8 @@ public class GradientButton extends JButton {
 
     @Override
     protected void paintComponent(Graphics g) {
+        setContentAreaFilled(false);
+        setFocusPainted(false);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                 RenderingHints.VALUE_RENDER_QUALITY);
