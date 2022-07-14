@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.src.controller;
+package com.app.controller;
 
 import java.util.*;
 import java.util.regex.*;
@@ -30,6 +30,7 @@ public class Validator {
     }
 
     public boolean isRequired(Object obj) {
+        this.message = "Trường này không được để trống";
         if (Objects.isNull(obj)) {
             this.object = null;
             return false;
@@ -82,7 +83,7 @@ public class Validator {
             JCheckBox ticked = jCheckBox;
             return !ticked.isSelected();
         }
-
+        
         return false;
     }
 
@@ -112,9 +113,15 @@ public class Validator {
     }
 
     public boolean isName(JTextField input) {
+        this.message = "Username không hợp lệ";
         final Pattern regex = Pattern.compile("[a-z\\D_-]{3,}$");
         Matcher matcher = regex.matcher(input.getText());
         return matcher.find();
+    }
+    
+    public boolean isName(JTextField input, String message) {
+        this.message = message.isEmpty() ? "Username không hợp lệ" : message;
+        return isName(input);
     }
 
     public boolean isPassword(JPasswordField password) {
