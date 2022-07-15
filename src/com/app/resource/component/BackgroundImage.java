@@ -1,4 +1,4 @@
-package com.app.mycomponent;
+package com.app.resource.component;
 
 import java.awt.Graphics;
 import java.awt.Image;

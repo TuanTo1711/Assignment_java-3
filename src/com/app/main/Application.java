@@ -1,6 +1,7 @@
 package com.app.main;
 
 import com.app.gui.Login;
+import java.text.Normalizer;
 
 public class Application {
 

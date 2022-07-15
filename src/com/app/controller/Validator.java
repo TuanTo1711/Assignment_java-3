@@ -30,6 +30,10 @@ public class Validator {
     }
 
     public boolean isRequired(Object obj) {
+        if (this.message == null) {
+            this.message = "This field is required";
+        }
+
         if (Objects.isNull(obj)) {
             this.object = null;
             return false;
@@ -105,35 +109,49 @@ public class Validator {
 
     public boolean isID(JTextField input, String message, String compareID) {
         this.message = (message == null || message.isEmpty())
-                ? "This ID is invalid" : message;
+                ? (this.message == null || this.message.isEmpty()
+                ? "This ID is invalid"
+                : this.message)
+                : message;
 
-        return compareID.equalsIgnoreCase(input.getText());
+        return input.getText().equalsIgnoreCase(compareID);
     }
 
     public boolean isID(JTextField input, String message, Pattern pattern) {
         this.message = (message == null || message.isEmpty())
-                ? "This ID is invalid" : message;
+                ? (this.message == null || this.message.isEmpty()
+                ? "This ID is invalid"
+                : this.message)
+                : message;
 
         return pattern.matcher(input.getText()).find();
     }
 
-    public boolean isPassword(JPasswordField password, String message, 
-                                String comparePassword) 
-    {
+    public boolean isPassword(JPasswordField password, String message,
+            String comparePassword) {
         this.message = (message == null || message.isEmpty())
-                ? "This password is invalid"
+                ? this.message != null ? this.message : "This password is invalid"
                 : message;
-        
+
         String password_value = String.valueOf(password.getPassword());
 
         return password_value.equalsIgnoreCase(comparePassword);
     }
 
+    public boolean isPassword(JPasswordField password, String message, Pattern pattern) {
+        this.message = (message == null || message.isEmpty())
+                ? (this.message == null || this.message.isEmpty()
+                ? "This ID is invalid"
+                : this.message)
+                : message;
+
+        return pattern.matcher(String.valueOf(password.getPassword())).find();
+    }
+
     public boolean isName(JTextField input, String message) {
         this.message = (message == null || message.isEmpty())
                 ? "This name is invalid" : message;
-        final Pattern regex = Pattern.compile("^[a-z\\D_-]{6,12}$");
-
+        final Pattern regex = Pattern.compile("^[a-z\\D_-]{3,}$");
         return regex.matcher(input.getText()).find();
     }
 
@@ -147,10 +165,18 @@ public class Validator {
     }
 
     public boolean isEmail(String email, String message) {
-        this.message = message == null || message.isEmpty() 
-                ? "Email is invalid" 
+        this.message = message == null || message.isEmpty()
+                ? "Email is invalid"
                 : message;
-        return email.matches("^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$");
+        return email.matches("^\\w+([\\\\.-]?\\w+)*@(fpt.edu.vn){1}$");
+    }
+    
+    public boolean isEmail(String email, String message, String compareEmail) {
+        this.message = message == null || message.isEmpty()
+                ? "Email is invalid"
+                : message;
+        return email.matches("^\\w+([\\\\.-]?\\w+)*@(fpt.edu.vn){1}$")
+                && compareEmail.equals(email);
     }
 
     public Object getObject() {
