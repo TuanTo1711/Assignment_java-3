@@ -1,7 +1,6 @@
 package com.app.main;
 
-import com.app.gui.Login;
-import java.text.Normalizer;
+import com.app.gui.*;
 
 public class Application {
 
@@ -22,7 +21,7 @@ public class Application {
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new Login().setVisible(true);
+            new Home().setVisible(true);
         });
     }
 

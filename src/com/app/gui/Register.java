@@ -9,9 +9,10 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class Login extends JFrame {
+public class Register extends JFrame {
 
     final Dimension fullscreenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
     private final String sourceImage = "com/app/imgs/login-bg.jpg";
     private final Image image = Toolkit.getDefaultToolkit()
             .getImage(getClass()
@@ -31,10 +32,9 @@ public class Login extends JFrame {
     private final Color bg_color = Color.white;
     private final Color bg_warning = Color.yellow;
 
-    public Login() throws HeadlessException {
-        super("Login");
+    public Register() throws HeadlessException {
+        super("Register");
         JFrame.setDefaultLookAndFeelDecorated(false);
-        this.setBackgroundImage();
         this.initUI();
         this.setAttributeComponents();
         this.setControls();
@@ -42,20 +42,14 @@ public class Login extends JFrame {
     }
 
     private void setBackgroundImage() {
+
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                System.out.println(Window.getWindows()[1].toString());
                 int width = Window.getWindows()[1].getWidth();
                 int height = Window.getWindows()[1].getHeight();
-                
-                System.out.println(width + " " + height);
-                
                 background.getScaledImage(width, height, Image.SCALE_FAST);
                 int GAP = (height - formPanel.getHeight()) / 2;
-                
-                System.out.println(GAP);
-                
                 background.setBorder(new EmptyBorder(GAP, 0, 0, 0));
             }
         });
@@ -63,10 +57,13 @@ public class Login extends JFrame {
 
     private void initUI() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setType(Type.POPUP);
+        this.setType(Window.Type.POPUP);
+        background.setBorder(new EmptyBorder(0, 0, 0, 0));
+//        this.setSize(new Dimension(800, 800));
         this.setMinimumSize(new Dimension(800, 800));
         this.setMaximumSize(fullscreenSize);
 
+        this.setBackgroundImage();
         this.setContentPane(background);
         this.setLocationRelativeTo(null);
 
@@ -87,9 +84,13 @@ public class Login extends JFrame {
         password = new JPasswordField();
         password_error_msg = new JLabel();
 
-        remember = new JCheckBox();
+        confirmPane = new JPanel();
+        confirmLayout = new GroupLayout(confirmPane);
+        confirmLabel = new JLabel();
+        confirm = new JPasswordField();
+        confirm_error_msg = new JLabel();
 
-        loginBtn = new GradientButton("LOGIN");
+        registerBtn = new GradientButton();
     }
 
     private void setAttributeComponents() {
@@ -101,7 +102,7 @@ public class Login extends JFrame {
         title.setFont(titleFont);
         title.setForeground(text_color);
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setText("Login");
+        title.setText("Register");
         title.setBorder(BorderFactory.createEmptyBorder(0, 0, 49, 0));
         // </editor-fold>
         // <editor-fold defaultstate="collapsed" desc="Username">
@@ -138,23 +139,33 @@ public class Login extends JFrame {
         password.setFocusable(false);
         password.setForeground(Color.lightGray);
         // </editor-fold>
-        // <editor-fold defaultstate="collapsed" desc="Checkbox remember">
-        remember.setFont(label_font);
-        remember.setText("Remember");
-        remember.setFocusable(false);
-        remember.setBorder(new EmptyBorder(0, 0, 35, 12));
-        remember.setHorizontalAlignment(SwingConstants.RIGHT);
-        remember.setBackground(bg_color);
-        remember.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        // </editor-fold>
-        // <editor-fold defaultstate="collapsed" desc="Login button">
-        loginBtn.setFont(button_font);
-        loginBtn.setFocusable(false);
-        loginBtn.setStartColor(new Color(0x00dbde));
-        loginBtn.setEndColor(new Color(0xfc00ff));
-        loginBtn.setGradientFocus(500);
-        loginBtn.setForeground(Color.white);
-        loginBtn.setCursor(new Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        confirmPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 23, 0));
+        confirmPane.setBackground(bg_color);
+
+        confirmLabel.setFont(label_font);
+        confirmLabel.setForeground(text_color);
+        confirmLabel.setLabelFor(confirm);
+        confirmLabel.setText("Confirm");
+
+        confirm_error_msg.setPreferredSize(new Dimension(300, 40));
+        confirm_error_msg.setFont(error_msg_font);
+        confirm_error_msg.setForeground(error_color);
+
+        confirm.setFont(input_font);
+        confirm.setFocusable(false);
+        confirm.setForeground(Color.lightGray);
+
+        // <editor-fold defaultstate="collapsed" desc="Register button">
+        registerBtn.setFont(button_font);
+        registerBtn.setText("Register".toUpperCase());
+        registerBtn.setFocusable(false);
+        registerBtn.setStartColor(new Color(0x00dbde));
+        registerBtn.setEndColor(new Color(0xfc00ff));
+        registerBtn.setGradientFocus(500);
+        registerBtn.setForeground(Color.white);
+        registerBtn.setCursor(new Cursor(java.awt.Cursor.HAND_CURSOR));
+        registerBtn.addActionListener((act) -> register());
         // </editor-fold>
         background.add(formPanel);
     }
@@ -166,12 +177,14 @@ public class Login extends JFrame {
         password.addMouseListener(new MouseAdapterImpl());
         password.addFocusListener(new FocusAdapterImpl());
 
-        loginBtn.addActionListener((act) -> login());
+        confirm.addMouseListener(new MouseAdapterImpl());
+        confirm.addFocusListener(new FocusAdapterImpl());
     }
 
     private void setControls() {
         userNameControl();
         passWordControl();
+        confirmControl();
         formControl();
     }
 
@@ -240,6 +253,40 @@ public class Login extends JFrame {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="Confirm Controller">
+    private void confirmControl() {
+        confirmPane.setLayout(confirmLayout);
+        confirmLayout.setHorizontalGroup(
+                confirmLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(confirmLayout.createSequentialGroup()
+                                .addGap(7, 7, 7)
+                                .addComponent(confirmLabel, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        )
+                        .addGroup(confirmLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(confirm)
+                                .addContainerGap()
+                        )
+                        .addGroup(confirmLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(confirm_error_msg)
+                                .addContainerGap()
+                        )
+        );
+
+        confirmLayout.setVerticalGroup(
+                confirmLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(confirmLayout.createSequentialGroup()
+                                .addComponent(confirmLabel, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addComponent(confirm, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addComponent(confirm_error_msg, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
+        );
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="Form Controller">
     private void formControl() {
         formPanel.setLayout(formLayout);
@@ -248,10 +295,8 @@ public class Login extends JFrame {
                         .addComponent(title, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(userPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(passwordPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.TRAILING,
-                                formLayout.createSequentialGroup()
-                                        .addComponent(remember))
-                        .addComponent(loginBtn, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(confirmPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(registerBtn, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         formLayout.setVerticalGroup(
                 formLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -262,82 +307,25 @@ public class Login extends JFrame {
                                 .addGap(0, 0, 0)
                                 .addComponent(passwordPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)
-                                .addComponent(remember, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(confirmPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)
-                                .addComponent(loginBtn, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(registerBtn, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
         );
     }
     // </editor-fold>
 
-    private JPanel formPanel, userPane, passwordPane;
-    private JLabel title, userLabel, passwordLabel;
-    private JLabel password_error_msg, username_error_msg;
+    private JPanel formPanel, userPane, passwordPane, confirmPane;
+    private JLabel title, userLabel, passwordLabel, confirmLabel;
+    private JLabel password_error_msg, username_error_msg, confirm_error_msg;
     private JTextField username;
-    private JPasswordField password;
-    private JCheckBox remember;
-    private GradientButton loginBtn;
-    private GroupLayout formLayout, userLayout, passwordLayout;
-    private final Validator validate = new Validator();
+    private JPasswordField password, confirm;
+    private GradientButton registerBtn;
+    private GroupLayout formLayout, userLayout, passwordLayout, confirmLayout;
+    private final Validator validator = new Validator();
 
-    private boolean checkValid(JTextField text) {
-        if (validate.isRequired(text, "Chưa nhập username")) {
-            text.setBackground(bg_warning);
-            username_error_msg.setText(validate.getMessage());
-            return false;
-        }
-
-        if (!validate.isID(text, "Username không hợp lệ",
-                Pattern.compile("^(PS|ps){1}\\d{5}$"))) {
-            username_error_msg.setText(validate.getMessage());
-            text.setBackground(bg_warning);
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean checkValid(JPasswordField pass) {
-        if (validate.isRequired(pass, "Chưa nhập password")) {
-            pass.setBackground(bg_warning);
-            password_error_msg.setText(validate.getMessage());
-            return false;
-        }
-
-        if (!validate.isPassword(pass, "Password không hợp lệ", "123456")) {
-            pass.setBackground(bg_warning);
-            password_error_msg.setText(validate.getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean validation() {
-        return checkValid(username) && checkValid(password);
-    }
-
-    private void login() {
-        Connector connector = new Connector("sa", "123456");
-        if (validation() && connector.isConnected()) {
-            System.out.println("Login Successfully");
-            java.util.List<java.util.List<String>> dataTable
-                    = connector.getDataFrom("Users");
-
-            String usernameValue = username.getText();
-            String passwordValue = String.valueOf(password.getPassword());
-
-            boolean anyMatch = dataTable.stream().anyMatch(row
-                    -> row.get(0).equals(usernameValue)
-                    && row.get(1).equals(passwordValue)
-            );
-
-            if (anyMatch) {
-                System.out.println("Correctly Accout");
-            } else {
-                System.out.println("Account is invalid");
-            }
-        }
+    private void register() {
+        System.out.println("Register.Clicked");
     }
 
     private class MouseAdapterImpl extends MouseAdapter {
@@ -350,11 +338,18 @@ public class Login extends JFrame {
             super.mouseClicked(e);
             username.setFocusable(true);
             password.setFocusable(true);
+            confirm.setFocusable(true);
 
             if (e.getSource() == username) {
                 username.requestFocus();
-            } else if (e.getSource() == password) {
+            }
+
+            if (e.getSource() == password) {
                 password.requestFocus();
+            }
+
+            if (e.getSource() == confirm) {
+                confirm.requestFocus();
             }
         }
     }
@@ -381,12 +376,60 @@ public class Login extends JFrame {
                 password.setSelectionEnd(Arrays.toString(password.getPassword()).length());
                 password_error_msg.setText("");
             }
+
+            if (e.getSource() == confirm) {
+                confirm.setBackground(bg_color);
+                confirm.setForeground(text_color);
+                confirm.setSelectionStart(0);
+                confirm.setSelectionEnd(Arrays.toString(confirm.getPassword()).length());
+                confirm_error_msg.setText("");
+            }
         }
 
         @Override
         public void focusLost(FocusEvent e) {
-            var c = e.getSource() == username ? checkValid(username)
-                    : checkValid(password);
+            if (e.getSource() == username && !checkValid(username)) {
+                username_error_msg.setText(validator.getMessage());
+            }
+
+            if (e.getSource() == password && !checkValid(password)) {
+                password_error_msg.setText(validator.getMessage());
+            }
+
+            if (e.getSource() == confirm && !checkValid(confirm)) {
+                confirm_error_msg.setText(validator.getMessage());
+            }
         }
+    }
+
+    private boolean checkValid(JTextField text) {
+        if (validator.isRequired(text, "Chưa nhập username")) {
+            text.setBackground(bg_warning);
+            username_error_msg.setText(validator.getMessage());
+            return false;
+        }
+
+        if (!validator.isID(text, "Username không hợp lệ",
+                Pattern.compile("^(PS|ps){1}\\d{5}$"))) {
+            username_error_msg.setText(validator.getMessage());
+            text.setBackground(bg_warning);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean checkValid(JPasswordField pass) {
+        if (validator.isRequired(pass, "Chưa nhập password")) {
+            pass.setBackground(bg_warning);
+            return false;
+        }
+
+        if (!validator.isPassword(pass, "Password không hợp lệ", "123456")) {
+            pass.setBackground(bg_warning);
+            return false;
+        }
+
+        return true;
     }
 }

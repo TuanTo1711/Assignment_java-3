@@ -1,4 +1,4 @@
-package com.app.resource.component;
+package com.app.customized;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -52,9 +52,9 @@ public class BackgroundImage extends JPanel {
         this.file = file;
     }
 
-    public void getScaledImage(int width, int height) {
+    public void getScaledImage(int width, int height, int scaled) {
         this.image = this.image
-                .getScaledInstance(width, height, Image.SCALE_FAST);
+                .getScaledInstance(width, height, scaled);
     }
 
     @Override

@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1">
+        <file>
+            <url>src/com/app/resource/component/Fonts.java</url>
+            <bookmark id="1">
+                <name/>
+                <line>0</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/E:/Code/Lab-ASSM/ASSM/java-3/Assignment_java_3/src/com/app/main/Application.java</file>
+            <file>file:/E:/Code/Lab-ASSM/ASSM/java-3/Assignment_java_3/src/com/app/controller/User.java</file>
             <file>file:/E:/Code/Lab-ASSM/ASSM/java-3/Assignment_java_3/src/com/app/gui/Login.java</file>
             <file>file:/E:/Code/Lab-ASSM/ASSM/java-3/Assignment_java_3/src/com/app/controller/Validator.java</file>
+            <file>file:/E:/Code/Lab-ASSM/ASSM/java-3/Assignment_java_3/src/com/app/controller/Connector.java</file>
         </group>
     </open-files>
 </project-private>

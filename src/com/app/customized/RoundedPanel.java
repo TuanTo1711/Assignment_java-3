@@ -1,4 +1,4 @@
-package com.app.resource.component;
+package com.app.customized;
 
 import java.awt.*;
 import javax.swing.*;
