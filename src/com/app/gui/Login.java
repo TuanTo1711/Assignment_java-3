@@ -4,14 +4,19 @@ import com.app.customized.*;
 import com.app.controller.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
+import java.util.*;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.*;
 import javax.swing.border.*;
 
 public class Login extends JFrame {
 
-    final Dimension fullscreenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    public static final Logger LOG = Logger.getLogger(Login.class.getName());
+    private final Dimension fullscreenSize = Toolkit.getDefaultToolkit()
+            .getScreenSize();
     private final String sourceImage = "com/app/imgs/login-bg.jpg";
     private final Image image = Toolkit.getDefaultToolkit()
             .getImage(getClass()
@@ -26,10 +31,15 @@ public class Login extends JFrame {
     private final Font button_font = new Font("Tahoma", Font.BOLD, 18);
     private final Font error_msg_font = new Font("Verdana", Font.ITALIC, 12);
 
-    private final Color text_color = new Color(51, 51, 51);
-    private final Color error_color = Color.red;
     private final Color bg_color = Color.white;
+    private final Color text_color = new Color(51, 51, 51);
+    private final Color error_text_color = Color.red;
     private final Color bg_warning = Color.yellow;
+
+    private final Color left_button_color = new Color(0x00dbde);
+    private final Color right_button_color = new Color(0xfc00ff);
+
+    private final Validator validator = new Validator();
 
     public Login() throws HeadlessException {
         super("Login");
@@ -41,21 +51,29 @@ public class Login extends JFrame {
         this.setListeners();
     }
 
+    public Login(
+            final String user,
+            final String pwd,
+            final boolean isChecked
+    ) throws HeadlessException {
+        this();
+        username.setText(user);
+        password.setText(pwd);
+        remember.setSelected(isChecked);
+
+        username.setForeground(text_color);
+        password.setForeground(text_color);
+    }
+
     private void setBackgroundImage() {
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                System.out.println(Window.getWindows()[1].toString());
                 int width = Window.getWindows()[1].getWidth();
                 int height = Window.getWindows()[1].getHeight();
-                
-                System.out.println(width + " " + height);
-                
                 background.getScaledImage(width, height, Image.SCALE_FAST);
                 int GAP = (height - formPanel.getHeight()) / 2;
-                
-                System.out.println(GAP);
-                
+
                 background.setBorder(new EmptyBorder(GAP, 0, 0, 0));
             }
         });
@@ -63,7 +81,7 @@ public class Login extends JFrame {
 
     private void initUI() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setType(Type.POPUP);
+
         this.setMinimumSize(new Dimension(800, 800));
         this.setMaximumSize(fullscreenSize);
 
@@ -114,12 +132,13 @@ public class Login extends JFrame {
         userLabel.setText("Username");
 
         username.setForeground(Color.lightGray);
+        username.setLayout(new FlowLayout(FlowLayout.RIGHT));
         username.setFocusable(false);
         username.setPreferredSize(new Dimension(380, 40));
         username.setFont(input_font);
 
         username_error_msg.setFont(error_msg_font);
-        username_error_msg.setForeground(error_color);
+        username_error_msg.setForeground(error_text_color);
         // </editor-fold>
         // <editor-fold defaultstate="collapsed" desc="Password">
         passwordPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 23, 0));
@@ -132,15 +151,20 @@ public class Login extends JFrame {
 
         password_error_msg.setPreferredSize(new Dimension(300, 40));
         password_error_msg.setFont(error_msg_font);
-        password_error_msg.setForeground(error_color);
+        password_error_msg.setForeground(error_text_color);
 
         password.setFont(input_font);
         password.setFocusable(false);
         password.setForeground(Color.lightGray);
+
+        password.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        password.add(showHiddenText(password));
+
         // </editor-fold>
         // <editor-fold defaultstate="collapsed" desc="Checkbox remember">
         remember.setFont(label_font);
         remember.setText("Remember");
+
         remember.setFocusable(false);
         remember.setBorder(new EmptyBorder(0, 0, 35, 12));
         remember.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -150,13 +174,37 @@ public class Login extends JFrame {
         // <editor-fold defaultstate="collapsed" desc="Login button">
         loginBtn.setFont(button_font);
         loginBtn.setFocusable(false);
-        loginBtn.setStartColor(new Color(0x00dbde));
-        loginBtn.setEndColor(new Color(0xfc00ff));
+        loginBtn.setStartColor(left_button_color);
+        loginBtn.setEndColor(right_button_color);
         loginBtn.setGradientFocus(500);
         loginBtn.setForeground(Color.white);
         loginBtn.setCursor(new Cursor(java.awt.Cursor.HAND_CURSOR));
         // </editor-fold>
         background.add(formPanel);
+    }
+
+    private Component showHiddenText(final JPasswordField typePassword) {
+        final JButton show = new JButton("Show");
+        show.setBorder(null);
+        show.setFocusPainted(false);
+        show.setOpaque(false);
+        show.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        show.setFont(label_font);
+
+        final char defaultEchoChar = typePassword.getEchoChar();
+
+        show.addActionListener((act) -> {
+            boolean echoCharIsSet = typePassword.echoCharIsSet();
+            if (echoCharIsSet) {
+                typePassword.setEchoChar((char) 0);
+                show.setText("Hidden");
+            } else {
+                typePassword.setEchoChar(defaultEchoChar);
+                show.setText("Show");
+            }
+        });
+
+        return show;
     }
 
     private void setListeners() {
@@ -166,7 +214,11 @@ public class Login extends JFrame {
         password.addMouseListener(new MouseAdapterImpl());
         password.addFocusListener(new FocusAdapterImpl());
 
+        this.addMouseListener(new MouseAdapterImpl());
+        formPanel.addMouseListener(new MouseAdapterImpl());
+
         loginBtn.addActionListener((act) -> login());
+        loginBtn.addMouseListener(new MouseAdapterImpl());
     }
 
     private void setControls() {
@@ -278,35 +330,35 @@ public class Login extends JFrame {
     private JCheckBox remember;
     private GradientButton loginBtn;
     private GroupLayout formLayout, userLayout, passwordLayout;
-    private final Validator validate = new Validator();
 
-    private boolean checkValid(JTextField text) {
-        if (validate.isRequired(text, "Chưa nhập username")) {
+    private boolean isValid(final JTextField text) {
+        if (validator.isRequired(text, "Please enter username!")) {
             text.setBackground(bg_warning);
-            username_error_msg.setText(validate.getMessage());
+            username_error_msg.setText(validator.getMessage());
             return false;
         }
 
-        if (!validate.isID(text, "Username không hợp lệ",
+        if (!validator.isID(text, "Username không hợp lệ",
                 Pattern.compile("^(PS|ps){1}\\d{5}$"))) {
-            username_error_msg.setText(validate.getMessage());
             text.setBackground(bg_warning);
+            username_error_msg.setText(validator.getMessage());
             return false;
         }
 
         return true;
     }
 
-    private boolean checkValid(JPasswordField pass) {
-        if (validate.isRequired(pass, "Chưa nhập password")) {
+    private boolean isValid(final JPasswordField pass) {
+        if (validator.isRequired(pass, "Please enter password!")) {
             pass.setBackground(bg_warning);
-            password_error_msg.setText(validate.getMessage());
+            password_error_msg.setText(validator.getMessage());
             return false;
         }
 
-        if (!validate.isPassword(pass, "Password không hợp lệ", "123456")) {
+        if (!validator.isPassword(pass, "Password must be 6 - 12 characters!",
+                Pattern.compile("^.{6,}$"))) {
             pass.setBackground(bg_warning);
-            password_error_msg.setText(validate.getMessage());
+            password_error_msg.setText(validator.getMessage());
             return false;
         }
 
@@ -314,30 +366,67 @@ public class Login extends JFrame {
     }
 
     private boolean validation() {
-        return checkValid(username) && checkValid(password);
+        return isValid(username) && isValid(password);
+    }
+
+    private void rememberCheck() {
+        if (!Account.isRemembered) {
+            Account.usernameSaved = username.getText();
+            Account.passwordSaved = String.valueOf(password.getPassword());
+            Account.isRemembered = true;
+        }
     }
 
     private void login() {
-        Connector connector = new Connector("sa", "123456");
-        if (validation() && connector.isConnected()) {
-            System.out.println("Login Successfully");
-            java.util.List<java.util.List<String>> dataTable
-                    = connector.getDataFrom("Users");
+        // connect to user and password and your database
+        Connector connector = new Connector("sa", "123456", "FPL_DaoTao");
+        if (validation() && connector.connection()) {
+            System.out.println("Connect Server Successfully");
+            var dataSQL = connector.getDataFrom("Users", Account.roleSaved);
 
             String usernameValue = username.getText();
             String passwordValue = String.valueOf(password.getPassword());
 
-            boolean anyMatch = dataTable.stream().anyMatch(row
+            boolean accountValid = dataSQL.stream().anyMatch(row
                     -> row.get(0).equals(usernameValue)
                     && row.get(1).equals(passwordValue)
             );
 
-            if (anyMatch) {
-                System.out.println("Correctly Accout");
+            if (accountValid) {
+                System.out.println("Login Successfully");
+                rememberCheck();
+                run(Account.roleSaved);
             } else {
-                System.out.println("Account is invalid");
+                System.out.println("Login Failed"); 
+                JOptionPane.showMessageDialog(this, "Account doesn't exists!");
             }
         }
+    }
+
+    private void run(final String role) {
+        switch (role) {
+            case "Teacher" -> {
+                EventQueue.invokeLater(() -> {
+                    new Teacher().setVisible(true);
+                });
+            }
+
+            case "Student" -> {
+                EventQueue.invokeLater(() -> {
+                    new Student().setVisible(true);
+                });
+            }
+
+            case "Manager" -> {
+                EventQueue.invokeLater(() -> {
+                    new Manager().setVisible(true);
+                });
+            }
+
+            default ->
+                throw new AssertionError();
+        }
+        this.dispose();
     }
 
     private class MouseAdapterImpl extends MouseAdapter {
@@ -346,7 +435,7 @@ public class Login extends JFrame {
         }
 
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void mousePressed(MouseEvent e) {
             super.mouseClicked(e);
             username.setFocusable(true);
             password.setFocusable(true);
@@ -355,7 +444,28 @@ public class Login extends JFrame {
                 username.requestFocus();
             } else if (e.getSource() == password) {
                 password.requestFocus();
+            } else {
+                username.setFocusable(false);
+                password.setFocusable(false);
             }
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            if (e.getSource() == loginBtn) {
+                loginBtn.setStartColor(right_button_color);
+                loginBtn.setEndColor(left_button_color);
+            }
+            super.mouseEntered(e);
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            if (e.getSource() == loginBtn) {
+                loginBtn.setStartColor(left_button_color);
+                loginBtn.setEndColor(right_button_color);
+            }
+            super.mouseExited(e);
         }
     }
 
@@ -385,8 +495,13 @@ public class Login extends JFrame {
 
         @Override
         public void focusLost(FocusEvent e) {
-            var c = e.getSource() == username ? checkValid(username)
-                    : checkValid(password);
+            if (e.getSource() == username && !isValid(username)) {
+                username_error_msg.setText(validator.getMessage());
+            }
+
+            if (e.getSource() == password && !isValid(password)) {
+                password_error_msg.setText(validator.getMessage());
+            }
         }
     }
 }

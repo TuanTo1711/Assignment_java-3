@@ -1,6 +1,9 @@
 package com.app.main;
 
 import com.app.gui.*;
+import java.util.logging.Level;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class Application {
 
@@ -8,14 +11,16 @@ public class Application {
         /* Set the Windows look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Windows".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException 
+                | IllegalAccessException 
+                | UnsupportedLookAndFeelException exception) {
+            Login.LOG.log(Level.SEVERE, "Error", exception);
         }
         //</editor-fold>
         
@@ -24,5 +29,4 @@ public class Application {
             new Home().setVisible(true);
         });
     }
-
 }

@@ -4,7 +4,7 @@ import com.app.customized.*;
 import com.app.controller.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
+import java.util.*;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -14,11 +14,12 @@ public class Register extends JFrame {
     final Dimension fullscreenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
     private final String sourceImage = "com/app/imgs/login-bg.jpg";
-    private final Image image = Toolkit.getDefaultToolkit()
-            .getImage(getClass()
-                    .getClassLoader()
-                    .getResource(sourceImage)
-            );
+    private final Image image = Toolkit
+                                .getDefaultToolkit()
+                                .getImage(getClass()
+                                        .getClassLoader()
+                                        .getResource(sourceImage)
+                                );
     private final BackgroundImage background = new BackgroundImage(image);
 
     private final Font titleFont = new Font("Consolas", Font.BOLD, 40);
@@ -59,8 +60,8 @@ public class Register extends JFrame {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setType(Window.Type.POPUP);
         background.setBorder(new EmptyBorder(0, 0, 0, 0));
-//        this.setSize(new Dimension(800, 800));
-        this.setMinimumSize(new Dimension(800, 800));
+
+        this.setMinimumSize(new Dimension(1000, 1000));
         this.setMaximumSize(fullscreenSize);
 
         this.setBackgroundImage();
@@ -84,11 +85,19 @@ public class Register extends JFrame {
         password = new JPasswordField();
         password_error_msg = new JLabel();
 
+        confirmLabel = new JLabel();
         confirmPane = new JPanel();
         confirmLayout = new GroupLayout(confirmPane);
-        confirmLabel = new JLabel();
         confirm = new JPasswordField();
         confirm_error_msg = new JLabel();
+
+        rolesLabel = new JLabel();
+        rolesPane = new JPanel();
+        rolesLayout = new GroupLayout(rolesPane);
+        teacherRole = new JRadioButton();
+        studentRole = new JRadioButton();
+        managerRole = new JRadioButton();
+        groupRoles = new ButtonGroup();
 
         registerBtn = new GradientButton();
     }
@@ -131,15 +140,18 @@ public class Register extends JFrame {
         passwordLabel.setLabelFor(password);
         passwordLabel.setText("Password");
 
+        password.setFont(input_font);
+        password.setName("password");
+        password.setFocusable(false);
+        password.setForeground(Color.lightGray);
+        password.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        password.add(showHiddenText(password));
+
         password_error_msg.setPreferredSize(new Dimension(300, 40));
         password_error_msg.setFont(error_msg_font);
         password_error_msg.setForeground(error_color);
 
-        password.setFont(input_font);
-        password.setFocusable(false);
-        password.setForeground(Color.lightGray);
         // </editor-fold>
-
         confirmPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 23, 0));
         confirmPane.setBackground(bg_color);
 
@@ -148,13 +160,15 @@ public class Register extends JFrame {
         confirmLabel.setLabelFor(confirm);
         confirmLabel.setText("Confirm");
 
-        confirm_error_msg.setPreferredSize(new Dimension(300, 40));
-        confirm_error_msg.setFont(error_msg_font);
-        confirm_error_msg.setForeground(error_color);
-
         confirm.setFont(input_font);
         confirm.setFocusable(false);
         confirm.setForeground(Color.lightGray);
+        confirm.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        confirm.add(showHiddenText(confirm));
+
+        confirm_error_msg.setPreferredSize(new Dimension(300, 40));
+        confirm_error_msg.setFont(error_msg_font);
+        confirm_error_msg.setForeground(error_color);
 
         // <editor-fold defaultstate="collapsed" desc="Register button">
         registerBtn.setFont(button_font);
@@ -167,7 +181,61 @@ public class Register extends JFrame {
         registerBtn.setCursor(new Cursor(java.awt.Cursor.HAND_CURSOR));
         registerBtn.addActionListener((act) -> register());
         // </editor-fold>
+
+        rolesPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 23, 0));
+        rolesPane.setBackground(bg_color);
+
+        rolesLabel.setFont(label_font);
+        rolesLabel.setForeground(text_color);
+        rolesLabel.setLabelFor(confirm);
+        rolesLabel.setText("Roles");
+
+        teacherRole.setFont(label_font);
+        teacherRole.setForeground(text_color);
+        teacherRole.setText("Giáo viên");
+        teacherRole.setOpaque(false);
+        teacherRole.setFocusable(false);
+
+        studentRole.setFont(label_font);
+        studentRole.setForeground(text_color);
+        studentRole.setText("Sinh viên");
+        studentRole.setOpaque(false);
+        studentRole.setFocusable(false);
+
+        managerRole.setFont(label_font);
+        managerRole.setForeground(text_color);
+        managerRole.setText("Cán bộ");
+        managerRole.setOpaque(false);
+        managerRole.setFocusable(false);
+
+        groupRoles.add(teacherRole);
+        groupRoles.add(studentRole);
+        groupRoles.add(managerRole);
+
         background.add(formPanel);
+    }
+
+    private Component showHiddenText(JPasswordField typePassword) {
+        JButton show = new JButton("Show");
+        show.setBorder(null);
+        show.setFocusPainted(false);
+        show.setOpaque(false);
+        show.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        show.setFont(label_font);
+
+        final char defaultEchoChar = typePassword.getEchoChar();
+        show.addActionListener((act) -> {
+            boolean echoCharIsSet = typePassword.echoCharIsSet();
+            if (echoCharIsSet) {
+                typePassword.setEchoChar((char) 0);
+                show.setText("Hidden");
+            } else {
+                typePassword.setEchoChar(defaultEchoChar);
+                show.setText("Show");
+            }
+        });
+
+        return show;
     }
 
     private void setListeners() {
@@ -185,6 +253,7 @@ public class Register extends JFrame {
         userNameControl();
         passWordControl();
         confirmControl();
+        rolesControl();
         formControl();
     }
 
@@ -287,6 +356,34 @@ public class Register extends JFrame {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="Confirm Controller">
+    public void rolesControl() {
+        rolesPane.setLayout(rolesLayout);
+        rolesLayout.setHorizontalGroup(
+                rolesLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(rolesLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(rolesLabel, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(teacherRole)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                                .addComponent(studentRole, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
+                                .addGap(10, 10, 10)
+                                .addComponent(managerRole))
+        );
+        rolesLayout.setVerticalGroup(
+                rolesLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(rolesLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(rolesLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(rolesLabel)
+                                        .addComponent(teacherRole)
+                                        .addComponent(studentRole)
+                                        .addComponent(managerRole)))
+        );
+    }
+    // </editor-fold>
+    
     // <editor-fold defaultstate="collapsed" desc="Form Controller">
     private void formControl() {
         formPanel.setLayout(formLayout);
@@ -296,6 +393,7 @@ public class Register extends JFrame {
                         .addComponent(userPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(passwordPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(confirmPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(rolesPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(registerBtn, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         formLayout.setVerticalGroup(
@@ -309,23 +407,60 @@ public class Register extends JFrame {
                                 .addGap(0, 0, 0)
                                 .addComponent(confirmPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)
+                                .addComponent(rolesPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
                                 .addComponent(registerBtn, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
         );
     }
     // </editor-fold>
 
-    private JPanel formPanel, userPane, passwordPane, confirmPane;
-    private JLabel title, userLabel, passwordLabel, confirmLabel;
+    private JPanel formPanel, userPane, passwordPane, confirmPane, rolesPane;
+    private JLabel title, userLabel, passwordLabel, confirmLabel, rolesLabel;
     private JLabel password_error_msg, username_error_msg, confirm_error_msg;
     private JTextField username;
     private JPasswordField password, confirm;
+    private JRadioButton teacherRole, studentRole, managerRole;
+    private ButtonGroup groupRoles;
     private GradientButton registerBtn;
-    private GroupLayout formLayout, userLayout, passwordLayout, confirmLayout;
+    private GroupLayout formLayout, userLayout, passwordLayout, confirmLayout, rolesLayout;
     private final Validator validator = new Validator();
 
     private void register() {
-        System.out.println("Register.Clicked");
+        new Login(Account.usernameSaved, Account.passwordSaved, Account.isRemembered);
+//        Connector connector = new Connector("sa", "123456");
+//        if (passwordConfirmed() && connector.connection()) {
+//            java.util.List<java.util.List<String>> dataTable
+//                    = connector.getDataFrom("Users");
+//
+//            final String usernameValue = String.valueOf(username.getText());
+//
+//            boolean userExists = dataTable
+//                    .stream()
+//                    .anyMatch(row -> row.get(0)
+//                    .equalsIgnoreCase(usernameValue));
+//
+//            if (userExists) {
+//
+//                ArrayList<String> tempRow = new ArrayList<>();
+//
+//                final String passwordValue = String.valueOf(password.getPassword());
+//
+//                tempRow.add(usernameValue);
+//                tempRow.add(passwordValue);
+////                    tempRow.add("Role");
+//
+//                dataTable.add(tempRow);
+//
+////                    connector.
+//            }
+//        }
+    }
+
+    private boolean passwordConfirmed() {
+        final String passwordValue = String.valueOf(password.getPassword());
+        final String confirmValue = String.valueOf(confirm.getPassword());
+        return passwordValue.equalsIgnoreCase(confirmValue);
     }
 
     private class MouseAdapterImpl extends MouseAdapter {
@@ -420,12 +555,12 @@ public class Register extends JFrame {
     }
 
     private boolean checkValid(JPasswordField pass) {
-        if (validator.isRequired(pass, "Chưa nhập password")) {
+        if (validator.isRequired(pass, "Chưa nhập " + pass.getName())) {
             pass.setBackground(bg_warning);
             return false;
         }
 
-        if (!validator.isPassword(pass, "Password không hợp lệ", "123456")) {
+        if (!validator.isPassword(pass, pass.getName() + " không hợp lệ", "123456")) {
             pass.setBackground(bg_warning);
             return false;
         }

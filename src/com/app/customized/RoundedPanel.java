@@ -40,8 +40,7 @@ public class RoundedPanel extends JPanel {
         Graphics2D graphics = (Graphics2D) g;
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-
-        //Draws the rounded panel with borders.
+        
         if (backgroundColor != null) {
             graphics.setColor(backgroundColor);
         } else {

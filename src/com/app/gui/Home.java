@@ -1,14 +1,12 @@
 package com.app.gui;
 
+import com.app.controller.Account;
 import com.app.customized.BackgroundImage;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 public class Home extends JFrame implements ActionListener {
-
-    public static volatile String role = null;
 
     private final String sourceSlider = "com/app/imgs/Banner.png";
     private final Image sliderImgae = Toolkit.getDefaultToolkit()
@@ -16,6 +14,7 @@ public class Home extends JFrame implements ActionListener {
                     .getClassLoader()
                     .getResource(sourceSlider)
             );
+
     private final BackgroundImage background = new BackgroundImage(sliderImgae);
 
     private final String sourceLogo = "com/app/imgs/logo_fpoly.png";
@@ -37,7 +36,6 @@ public class Home extends JFrame implements ActionListener {
     }
 
     private void setBackgroundImage() {
-
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -50,17 +48,18 @@ public class Home extends JFrame implements ActionListener {
 
     private void initUI() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+        this.setType(Type.NORMAL);
+        
         this.setMaximumSize(fullscreenSize);
+        this.setMinimumSize(new Dimension(800, 800));
         this.setResizable(false);
-        this.setMinimumSize(new Dimension(1200, 800));
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
 
         background.setBackground(Color.white);
         this.add(background, BorderLayout.CENTER);
 
-        header = new JPanel(new FlowLayout(FlowLayout.LEADING, 30, 20));
+        header = new JPanel(new FlowLayout(FlowLayout.LEADING, 40, 20));
         header.setBackground(Color.white);
         this.add(header, BorderLayout.NORTH);
 
@@ -69,7 +68,7 @@ public class Home extends JFrame implements ActionListener {
         logoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         header.add(logoLabel);
 
-        CBDT = new JButton("Cán Bộ Đào Tạo");
+        CBDT = new JButton("Mangager");
         CBDT.setFont(myFont);
         CBDT.setFocusPainted(false);
         CBDT.setBorder(null);
@@ -78,7 +77,7 @@ public class Home extends JFrame implements ActionListener {
         CBDT.addActionListener(this);
         header.add(CBDT);
 
-        SV = new JButton("Sinh Viên");
+        SV = new JButton("Student");
         SV.setFont(myFont);
         SV.setFocusPainted(false);
         SV.setBorder(null);
@@ -87,7 +86,7 @@ public class Home extends JFrame implements ActionListener {
         SV.addActionListener(this);
         header.add(SV);
 
-        GV = new JButton("Giáo Viên");
+        GV = new JButton("Teacher");
         GV.setFont(myFont);
         GV.setFocusPainted(false);
         GV.setBorder(null);
@@ -103,10 +102,11 @@ public class Home extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        role = e.getActionCommand();
+        Account.roleSaved = e.getActionCommand();
+        System.out.println(Account.roleSaved);
         EventQueue.invokeLater(() -> {
-            new Register().setVisible(true);
-            this.dispose();
+            new Login().setVisible(true);
+             this.dispose();
         });
     }
 }
