@@ -1,7 +1,8 @@
 package com.app.main;
 
-import com.app.gui.*;
+import com.app.view.Login;
 import java.util.logging.Level;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -17,16 +18,16 @@ public class Application {
                     break;
                 }
             }
-        } catch (ClassNotFoundException | InstantiationException 
-                | IllegalAccessException 
+        } catch (ClassNotFoundException | InstantiationException
+                | IllegalAccessException
                 | UnsupportedLookAndFeelException exception) {
             Login.LOG.log(Level.SEVERE, "Error", exception);
         }
         //</editor-fold>
-        
+
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new Home().setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            new Login().setVisible(true);
         });
     }
 }

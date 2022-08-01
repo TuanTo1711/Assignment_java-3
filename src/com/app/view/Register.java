@@ -1,4 +1,4 @@
-package com.app.gui;
+package com.app.view;
 
 import com.app.customized.*;
 import com.app.controller.*;
@@ -427,7 +427,7 @@ public class Register extends JFrame {
     private final Validator validator = new Validator();
 
     private void register() {
-        new Login(Account.usernameSaved, Account.passwordSaved, Account.isRemembered);
+        new Login(Account.usernameSaved, Account.passwordSaved, Account.isRemembered).setVisible(true);
 //        Connector connector = new Connector("sa", "123456");
 //        if (passwordConfirmed() && connector.connection()) {
 //            java.util.List<java.util.List<String>> dataTable

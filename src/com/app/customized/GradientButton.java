@@ -16,6 +16,7 @@ public class GradientButton extends JButton {
     private int gradientFocus;
 
     public GradientButton() {
+        setBg(transparentControls);
     }
 
     public GradientButton(String text) {

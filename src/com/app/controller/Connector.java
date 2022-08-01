@@ -15,20 +15,9 @@ public class Connector {
             + "trustServerCertificate=true";
 
     private String user;
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
     private String pass;
     private String databaseName;
-
-    private String tableName;
-
-    Connection connect;
+    protected Connection connect;
 
     public Connector() {
     }
@@ -53,7 +42,7 @@ public class Connector {
         this.databaseName = databaseName;
     }
 
-    public boolean connection() {
+    public boolean isConnected() {
         try {
             this.connect = DriverManager.getConnection(url, user, pass);
         } catch (SQLException ex) {
@@ -81,38 +70,9 @@ public class Connector {
                 }
                 table.add(temp);
             }
-
-            table.forEach(row -> Arrays.toString(row.toArray()));
         } catch (SQLException ex) {
             LOG.log(Level.WARNING, "Can't get data from " + tableName, ex);
         }
-        return table;
-    }
-
-    public List<List<String>> getDataFrom(String tableName, String role) {
-        List<List<String>> table = new ArrayList();
-        try {
-            final String query = "use " + databaseName
-                    + " select * from " + tableName
-                    + " where Role = " + "\'" + role + "\'";
-
-            final Statement state = this.connect.createStatement();
-            final ResultSet res = state.executeQuery(query);
-            final ResultSetMetaData rsmd = res.getMetaData();
-
-            int column_count = rsmd.getColumnCount();
-
-            while (res.next()) {
-                List<String> temp = new ArrayList<>();
-                for (int i = 1; i <= column_count; i++) {
-                    temp.add(res.getString(i));
-                }
-                table.add(temp);
-            }
-        } catch (SQLException ex) {
-            LOG.log(Level.WARNING, "Can't get data from " + tableName, ex);
-        }
-
         return table;
     }
 
@@ -130,13 +90,5 @@ public class Connector {
                 )
                 .toList();
         return deleted;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 }
